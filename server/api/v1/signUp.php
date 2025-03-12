@@ -33,7 +33,8 @@
             exit;
         }
 
-        $user = new User($conn, $full_name, $email, $password);
+        $user = new User($conn, null, $full_name, $email, $password);
+
         if ($user->create()) {
             echo json_encode(['success' => 'User registered successfully']);
         } else {

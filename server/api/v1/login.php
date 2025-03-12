@@ -17,20 +17,29 @@
     }
 
     $email = trim($data['email']);
+    
     $password = $data['password'];
-
+    
     $user = User::findByEmail($conn, $email);
-
-    if (!$user || !password_verify($password, $user->password)) {
+    if (!$user) {
+        echo json_encode(['error' => 'Invalid credentials']);
+        exit;
+    }
+    
+    $password_data = $user->getPassword();
+    
+    if (!$user || !password_verify($password, $password_data)) {
         echo json_encode(['error' => 'Invalid credentials']);
         exit;
     }
 
+    $full_name=$user->getName();
+    $logged_email= $user->getEmail();
     echo json_encode([
         'success' => 'Login successful',
         'user' => [
-            'full_name' => $user->full_name,
-            'email' => $user->email
+            'full_name' => $full_name,
+            'email' =>$logged_email
         ]
     ]);
 ?>

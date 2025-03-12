@@ -1,56 +1,47 @@
 <?php
-require_once __DIR__ . '/../../models/User.php';
+require("../../models/Photo.php");
 
 header('Content-Type: application/json');
 header("Access-Control-Allow-Origin: *"); 
 header("Access-Control-Allow-Methods: POST, OPTIONS"); 
-header("Access-Control-Allow-Headers: Content-Type, Authorization"); 
+header("Access-Control-Allow-Headers: Content-Type");
 
+if (!isset($_POST['user_id'], $_POST['title'], $_POST['description'], $_POST['tags'], $_FILES['photo'])) {
+    echo json_encode(['error' => 'Missing required fields']);
+    exit;
+}
+$user_id = intval($_POST['user_id']);
+$title = trim($_POST['title']);
+$description = trim($_POST['description']);
+$tags = trim($_POST['tags']);
+$file = $_FILES['photo'];
 
-if (!isset($_FILES['profile_image']) || $_FILES['profile_image']['error'] !== UPLOAD_ERR_OK) {
-    echo json_encode(['error' => 'No file uploaded or upload error']);
+$allowedFileTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+$uploadPic = __DIR__ . "/../uploads/";
+
+if (!in_array($file['type'], $allowedFileTypes)) {
+    echo json_encode(['error' => 'Invalid file type. Only JPG, PNG allowed.']);
     exit;
 }
 
-$allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
-$fileType = $_FILES['profile_image']['type'];
-
-if (!in_array($fileType, $allowedTypes)) {
-    echo json_encode(['error' => 'Invalid file type. Only JPG, PNG, and GIF allowed.']);
+if ($file['size'] > 5 * 1024 * 1024) {
+    echo json_encode(['error' => ' size > 5MB']);
     exit;
 }
 
-$maxFileSize = 2 * 1024 * 1024; 
-if ($_FILES['profile_image']['size'] > $maxFileSize) {
-    echo json_encode(['error' => 'Size > 2MB']);
-    exit;
+$filename = time() . "_" . basename($file['name']);
+$filepath = $uploadPic . $filename;
+$fileUrl = "uploads/" . $filename;
+
+if (!is_dir(__DIR__ . "/../uploads/")) {
+    mkdir(__DIR__ . "/../uploads/", 0777, true);
 }
-
-$user_id = $_POST['user_id'] ?? null;
-
-if (!$user_id || !User::findById($conn, $user_id)) {
-    echo json_encode(['error' => 'Invalid user ID']);
-    exit;
-}
-
-$uploadDir = __DIR__ . '/../../uploads/';
-if (!is_dir($uploadDir)) {
-    mkdir($uploadDir, 0777, true);
-}
-
-$extension = pathinfo($_FILES['profile_image']['name'], PATHINFO_EXTENSION);
-$fileName = "user_{$user_id}_" . time() . ".$extension";
-$filePath = $uploadDir . $fileName;
-
-if (!move_uploaded_file($_FILES['profile_image']['tmp_name'], $filePath)) {
-    echo json_encode(['error' => 'Failed to save file']);
-    exit;
-}
-
-$imageUrl = "uploads/$fileName"; 
-if (User::updateProfileImage($conn, $user_id, $imageUrl)) {
-    echo json_encode(['success' => 'Profile image uploaded successfully', 'image_url' => $imageUrl]);
+if (move_uploaded_file($file['tmp_name'], $filepath)) {
+    $photo = new Photo($conn, $id=null, $user_id, $title, $description, $tags, $fileUrl);
+    $result = $photo->uploadPhoto($user_id, $title, $description, $tags, $fileUrl);
+    echo json_encode($result);
 } else {
-    echo json_encode(['error' => 'Database update failed']);
+    echo json_encode(['error' => 'Failed to upload file']);
 }
+
 ?>

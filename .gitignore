@@ -6,6 +6,9 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+pic04.jpg
+banner.jpg
+try1.jpg
 
 node_modules
 dist
