@@ -1,12 +1,5 @@
-# React + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Full-stack web application that allows users to manage a personal photo gallery. Built with React on the frontend and PHP on the backend, the system support the complete range of CRUD operations. 
+Users can upload new photos, complete with associated metadata such as title, description, and tags.
+The gallery view displays all photos in an organized, visually appealing layout, with options for filtering by tags and searching.
+Users can edit the title, description, or replacing the image.
+Users can deleted images.
