@@ -19,9 +19,8 @@
             $full_name = $this->getName();
             $email = $this->getEmail();
             $password = $this->getPassword();
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-            $stmt->bind_param('sss', $full_name, $email, $hashed_password);
+            $stmt->bind_param('sss', $full_name, $email, $password);
 
             if (!$stmt->execute()) {
                 error_log("Execute failed: " . $stmt->error);
@@ -39,7 +38,6 @@
             $stmt->execute();
             $result = $stmt->get_result();
             $userData = $result->fetch_assoc();
-
             if ($userData) {
                 return new self($conn,$userData['id'], $userData['full_name'], $userData['email'], $userData['password']);
             }
