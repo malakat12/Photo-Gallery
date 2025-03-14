@@ -79,6 +79,7 @@
             echo json_encode([
                 'success' => 'Login successful',
                 'user' => [
+                    'id' => $user->getId(),
                     'full_name' => $full_name,
                     'email' =>$logged_email
                 ]

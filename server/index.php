@@ -4,16 +4,13 @@
     header("Access-Control-Allow-Methods: POST, OPTIONS"); 
     header("Access-Control-Allow-Headers: Content-Type");
 
-    // Define your base directory 
     $base_dir = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
     $request = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     $request = str_replace('/api/v1/', '/', $request);
 
-    // Remove the base directory from the request if present
     if (strpos($request, $base_dir) === 0) {
         $request = substr($request, strlen($base_dir));
     }
-    // Ensure the request is at least '/'
     if ($request == '') {
         $request = '/';
     }
@@ -22,7 +19,8 @@
         '/login'         => ['controller' => 'UserController', 'method' => 'login'],
         '/signUp'         => ['controller' => 'UserController', 'method' => 'signUp'],
         '/upload'    => ['controller' => 'PhotoController', 'method' => 'upload'],
-        '/update'         => ['controller' => 'PhotoController', 'method' => 'update']
+        '/getAll'         => ['controller' => 'PhotoController', 'method' => 'getAll'],
+        '/delete'         => ['controller' => 'PhotoController', 'method' => 'deletePhoto']
 
     ];
 

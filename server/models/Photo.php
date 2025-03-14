@@ -22,7 +22,15 @@ class Photo extends PhotoSkeleton{
         }
     }
 
-    public function getPhotoById($id) {
+    public function getPhotosByUserId($user_id) {
+        $sql = "SELECT * FROM photos WHERE user_id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public function getPhotosById($id) {
         $sql = "SELECT * FROM photos WHERE id = ?";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("i", $id);
@@ -30,11 +38,21 @@ class Photo extends PhotoSkeleton{
         return $stmt->get_result()->fetch_assoc();
     }
 
+
     public function getPhotoByTags($tags){
         $sql = "SELECT * FROM photos WHERE tags LIKE ?";
         $stmt = $this->conn->prepare($sql);
         $oneTag = "%$tags%";
         $stmt->bind_param("s", $oneTag);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public function getPhotoByTitle($title){
+        $sql = "SELECT * FROM photos WHERE title LIKE ?";
+        $stmt = $this->conn->prepare($sql);
+        $title = "%$title%";
+        $stmt->bind_param("s", $title);
         $stmt->execute();
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
@@ -48,23 +66,33 @@ class Photo extends PhotoSkeleton{
     }
     
 
-    public function delete()
-    {
+    public function delete($id) {
+        $query = "SELECT url FROM photos WHERE id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $photo = $result->fetch_assoc();
+        $stmt->close();
+        
+        if (!$photo) {
+            return ["success" => false, "message" => "Photo not found."];
+        }
+    
         $query = "DELETE FROM photos WHERE id = ?";
         $stmt = $this->conn->prepare($query);
-        $id=$this->getId();
-
-        $photo =$stmt->bind_param('i', $id);
-
+        $stmt->bind_param("i", $id);
+    
         if ($stmt->execute()) {
-            $filePath = __DIR__ . "/../../" . $photo['url'];
+            $filePath = __DIR__ . "/../../" . $photo['url']; // Get the file path
             if (file_exists($filePath)) {
-                unlink($filePath);
+                unlink($filePath); 
             }
             return ["success" => true, "message" => "Photo deleted successfully."];
         } else {
             return ["success" => false, "message" => "Database error: " . $stmt->error];
         }
     }
+    
 }
 ?>

@@ -1,21 +1,19 @@
-import React from "react";
-import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import Gallery from "./pages/Gallery";
-import Upload from "./pages/Upload";
 
 function App() {
-    return (
-        <Router>
-            <nav>
-                <Link to="/">Gallery</Link>
-                <Link to="/upload">Upload</Link>
-            </nav>
-            <Routes>
-                <Route path="/" element={<Gallery />} />
-                <Route path="/upload" element={<Upload />} />
-            </Routes>
-        </Router>
-    );
+  return (
+    <Router>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/gallery" element={<Gallery />} />
+        <Route path="/" element={<Login />} /> {/* Default route */}
+      </Routes>
+    </Router>
+  );
 }
 
 export default App;

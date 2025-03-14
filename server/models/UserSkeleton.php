@@ -11,6 +11,8 @@
 
         private $password;
 
+        
+
         public function __construct($id, $full_name, $email, $password) {
             $this->id = $id;
             $this->full_name = $full_name;

@@ -3,45 +3,77 @@
 
 
     class PhotoController{
+
+        static function getAll() {
+            global $conn;
+        
+            if (!isset($_GET['user_id'])) {
+                echo json_encode(["error" => "Missing user ID"]);
+                exit;
+            }
+        
+            $user_id = intval($_GET['user_id']);
+            $photo = new Photo($conn, null, null, null, null, null, null);
+            $photos = $photo->getPhotosByUserId($user_id); 
+        
+            if ($photos) {
+                echo json_encode($photos);
+            } else {
+                echo json_encode(["error" => "No photos found for this user"]);
+            }
+        }
+
         static function upload(){
             global $conn;
+            $data = json_decode(file_get_contents("php://input"), true);
 
-            if (!isset($_POST['user_id'], $_POST['title'], $_POST['description'], $_POST['tags'], $_FILES['photo'])) {
+            file_put_contents("debug_update.txt", json_encode($data) . PHP_EOL, FILE_APPEND);
+
+           
+            if (!isset($data['user_id'], $data['title'], $data['description'], $data['tags'], $data['photo'])) {
                 echo json_encode(['error' => 'Missing required fields']);
                 exit;
             }
-            $user_id = intval($_POST['user_id']);
-            $title = trim($_POST['title']);
-            $description = trim($_POST['description']);
-            $tags = trim($_POST['tags']);
-            $file = $_FILES['photo'];
+            $user_id = intval($data['user_id']);
+            $title = trim($data['title']);
+            $description = trim($data['description']);
+            $tags = trim($data['tags']);
+            $base64Image = $data['photo'];
             
-            $allowedFileTypes = ['image/jpeg', 'image/png', 'image/jpg'];
             $uploadPic = __DIR__ . "/../uploads/";
             
-            if (!in_array($file['type'], $allowedFileTypes)) {
-                echo json_encode(['error' => 'Invalid file type. Only JPG, PNG allowed.']);
+            if (!is_dir($uploadPic)) {
+                mkdir($uploadPic, 0777, true);
+            }
+
+            if (preg_match('/^data:image\/(\w+);base64,/', $base64Image, $matches)) {
+                $imageType = $matches[1]; 
+                $base64Image = substr($base64Image, strpos($base64Image, ',') + 1); 
+                $base64Image = base64_decode($base64Image); 
+                if ($base64Image === false) {
+                    echo json_encode(['error' => 'Invalid Base64 image data']);
+                    exit;
+                }
+            } else {
+                echo json_encode(['error' => 'Invalid base64 image format']);
                 exit;
             }
-            
-            if ($file['size'] > 5 * 1024 * 1024) {
-                echo json_encode(['error' => ' size > 5MB']);
-                exit;
-            }
-            
-            $filename = time() . "_" . basename($file['name']);
+
+            $filename = time() . "_" . uniqid() . "." . $imageType;
             $filepath = $uploadPic . $filename;
             $fileUrl = "uploads/" . $filename;
-            
-            if (!is_dir(__DIR__ . "/../uploads/")) {
-                mkdir(__DIR__ . "/../uploads/", 0777, true);
-            }
-            if (move_uploaded_file($file['tmp_name'], $filepath)) {
-                $photo = new Photo($conn, $id=null, $user_id, $title, $description, $tags, $fileUrl);
+
+            if (file_put_contents($filepath, $base64Image)) {
+                $photo = new Photo($conn, null, $user_id, $title, $description, $tags, $fileUrl);
                 $result = $photo->uploadPhoto($user_id, $title, $description, $tags, $fileUrl);
-                echo json_encode($result);
+
+            if ($result) {
+                echo json_encode(["success" => "Photo uploaded", "url" => $fileUrl]);
             } else {
-                echo json_encode(['error' => 'Failed to upload file']);
+                echo json_encode(["error" => "Database error while saving photo"]);
+            }
+            } else {
+                echo json_encode(['error' => 'Failed to save the image']);
             }
             
         }
@@ -49,23 +81,24 @@
 
     static function update(){
         global $conn;
+        $data = json_decode(file_get_contents("php://input"), true);
 
+        file_put_contents("debug_update.txt", json_encode($data) . PHP_EOL, FILE_APPEND);
+    
+       
         $photo = new Photo($conn,null,null,null,null,null,null); 
 
-        if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-            echo json_encode(["error" => "Invalid request method"]);
-            exit;
-        }
 
-        if (!isset($_POST['id'], $_POST['title'], $_POST['tags'], $_POST['description'])) {
+        if (!isset($data['id'], $data['title'], $data['tags'], $data['description'], $data['photo'])) {
             echo json_encode(["error" => "Missing required fields"]);
             exit;
         }
 
-        $id = intval($_POST["id"]);
-        $title = htmlspecialchars(trim($_POST["title"]));
-        $description = htmlspecialchars(trim($_POST["description"]));
-        $tags = htmlspecialchars(trim($_POST["tags"]));
+        $id = intval($data["id"]);
+        $title = htmlspecialchars(trim($data["title"]));
+        $description = htmlspecialchars(trim($data["description"]));
+        $tags = htmlspecialchars(trim($data["tags"]));
+        $base64Image = $data["photo"];
 
         $existingPhoto = $photo->getPhotoById($id);
         if (!$existingPhoto) {
@@ -74,41 +107,71 @@
         }
 
         $uploadDir = __DIR__ . "/../uploads/";
-        $newImageURL = $existingPhoto["url"]; 
-
-        if (isset($_FILES["photo"]) && $_FILES["photo"]["error"] === UPLOAD_ERR_OK) {
-            $allowedTypes = ["image/jpeg", "image/png"];
-            $fileType = mime_content_type($_FILES["photo"]["tmp_name"]);
-
-            if (!in_array($fileType, $allowedTypes)) {
-                echo json_encode(["error" => "Invalid file type. Only JPG and PNG allowed."]);
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+        
+        if (preg_match('/^data:image\/(\w+);base64,/', $base64Image, $matches)) {
+            $imageType = strtolower($matches[1]);
+            $allowedExtensions = ['jpg', 'jpeg', 'png'];
+    
+            if (!in_array($imageType, $allowedExtensions)) {
+                echo json_encode(["error" => "Unsupported image format"]);
                 exit;
             }
-
-            $oldFilePath = $uploadDir . basename($existingPhoto["url"]);
-            if (file_exists($oldFilePath)) {
-                unlink($oldFilePath);
+    
+            $base64Image = substr($base64Image, strpos($base64Image, ',') + 1);
+            $base64Image = base64_decode($base64Image);
+    
+            if ($base64Image === false) {
+                echo json_encode(["error" => "Invalid Base64 image data"]);
+                exit;
             }
-
-            $extension = pathinfo($_FILES["photo"]["name"], PATHINFO_EXTENSION);
-            $newFileName = uniqid() . "." . $extension;
+    
+            $newFileName = time() . "_" . uniqid() . "." . $imageType;
             $newFilePath = $uploadDir . $newFileName;
+            $newImageURL = "uploads/" . $newFileName;
 
-            if (move_uploaded_file($_FILES["photo"]["tmp_name"], $newFilePath)) {
-                $newImageURL = "uploads/" . $newFileName;
+            if (file_put_contents($newFilePath, $base64Image)) {
+                $oldFilePath = $uploadDir . basename($existingPhoto["url"]);
+                if (file_exists($oldFilePath)) {
+                    unlink($oldFilePath);
+                }
             } else {
-                echo json_encode(["error" => "Failed to upload new image"]);
+                echo json_encode(["error" => "Failed to save new image"]);
                 exit;
             }
+        } else {
+            echo json_encode(["error" => "Invalid Base64 image format"]);
+            exit;
         }
+    
+        $updateResult = $photo->updatePhoto($id, $title, $description, $tags, $newImageURL);
+    
+        if ($updateResult) {
+            echo json_encode(["success" => "Photo updated successfully!", "url" => $newImageURL]);
+        } else {
+            echo json_encode(["error" => "Failed to update photo"]);
+        }
+    }
 
-            $updateResult = $photo->updatePhoto($id, $title, $description, $tags, $newImageURL);
+        static function deletePhoto() {
+            global $conn;
+            $data = json_decode(file_get_contents("php://input"), true);
 
-            if ($updateResult) {
-                echo json_encode(["success" => "Photo updated successfully!", "url" => $newImageURL]);
-            } else {
-                echo json_encode(["error" => "Failed to update photo"]);
+            file_put_contents("debug_update.txt", json_encode($data) . PHP_EOL, FILE_APPEND);
+   
+            if (!isset($data['id'])) {
+                echo json_encode(["error" => "Missing photo ID"]);
+                exit;
             }
+        
+            $photo = new Photo($conn, null, null, null, null, null, null);
+            $result = $photo->delete(intval($data['id']));
+            
+            echo json_encode($result);
         }
+        
+        
     }
 ?>
