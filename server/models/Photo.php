@@ -30,7 +30,7 @@ class Photo extends PhotoSkeleton{
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
-    public function getPhotosById($id) {
+    public function getPhotoById($id) {
         $sql = "SELECT * FROM photos WHERE id = ?";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("i", $id);

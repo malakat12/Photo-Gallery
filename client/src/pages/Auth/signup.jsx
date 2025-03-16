@@ -4,6 +4,7 @@ import { requestMethods } from "../../utils/enums/request.methods";
 import { request } from "../../utils/remote/axios";
 import { colors } from "../../utils/enums/colors.enum";
 import { useNavigate } from "react-router-dom";
+import "./style.css";
 
 const Signup = () => {
   const [form, setForm] = useState({

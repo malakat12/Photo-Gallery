@@ -26,8 +26,8 @@
         '/signUp'         => ['controller' => 'UserController', 'method' => 'signUp'],
         '/upload'    => ['controller' => 'PhotoController', 'method' => 'upload'],
         '/getAll'         => ['controller' => 'PhotoController', 'method' => 'getAll'],
-        '/delete'         => ['controller' => 'PhotoController', 'method' => 'deletePhoto']
-
+        '/delete'         => ['controller' => 'PhotoController', 'method' => 'deletePhoto'],
+        '/update'         => ['controller' => 'PhotoController', 'method' => 'update']
     ];
 
     if (isset($apis[$request])) {

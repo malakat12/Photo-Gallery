@@ -1,15 +1,15 @@
 import React from "react";
+import "./style.css";
 
 const Button = ({
   text,
   onClick,
-  color = "black-bg",
   textColor = "white-text",
 }) => {
   return (
     <button
       onClick={onClick}
-      className={`button flex center ${color} ${textColor}`}
+      className={`button flex center ${textColor}`}
     >
       {text}
     </button>

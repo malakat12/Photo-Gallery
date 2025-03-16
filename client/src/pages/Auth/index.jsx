@@ -5,6 +5,8 @@ import { requestMethods } from "../../utils/enums/request.methods";
 import { request } from "../../utils/remote/axios";
 import { colors } from "../../utils/enums/colors.enum";
 import { useNavigate } from "react-router-dom";
+import "./style.css";
+
 
 const Auth = () => {
   const [form, setForm] = useState({
@@ -43,13 +45,15 @@ const Auth = () => {
   };
 
   return (
-    <div className="flex column">
+    <div className="auth-container">
+      <div className="auth-box">
+      <h2 className="auth-title">Login</h2>
       <input
         type="text"
         name="email"
         placeholder="email"
         onChange={handleInputChange}
-      />
+      /><br></br>
       <input
         type="password"
         name="password"
@@ -58,10 +62,11 @@ const Auth = () => {
       />
       {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
 
-      <Button text="Login" onClick={login} textColor={colors.BLACK} color="" />
-      <p>Don't have an account?</p> 
-      <Link to="/auth/signup">Sign Up</Link>
+      <Button text="Login" onClick={login} className="auth-button"/>
+      <p className="auth-link">Don't have an account? <Link to="/auth/signup">Sign Up</Link></p> 
+      
 
+    </div>
     </div>
   );
 };

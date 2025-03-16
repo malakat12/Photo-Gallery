@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import useHomeLogic from "./useHomeLogic";
+import "./style.css";
 
 const Home = () => {
   const { 
@@ -8,14 +9,22 @@ const Home = () => {
     setShowUploadModal, 
     newPhoto, 
     setNewPhoto, 
-    uploadPhoto 
+    handleFileChange, 
+    uploadPhoto,
+    deletePhoto, 
+    startEditing, 
+    updatePhoto,
+    editingPhoto,
   } = useHomeLogic();
-
+  const baseUrl = "http://localhost/Photo-Gallery/server/api";
   return (
     <div>
       <h1>Photo Gallery</h1>
 
-      <button onClick={() => setShowUploadModal(true)} className="upload-button">
+      <button onClick={() =>{
+        setShowUploadModal(true);
+        setNewPhoto({ title: "", description: "", tags: "", photo: "" });
+      } } className="upload-button">
         Upload New Photo
       </button>
 
@@ -25,10 +34,18 @@ const Home = () => {
         ) : (
           photos.map((photo) => (
             <div className="photo-item" key={photo.id}>
-              <img src={photo.url} alt={photo.title} className="photo-image" />
+              <img
+                src={`${baseUrl}/${photo.url}`} 
+                alt={photo.title}
+                className="photo-image"
+              />              
               <p>{photo.title}</p>
               <p>{photo.description}</p>
               <small>Tags: {photo.tags}</small>
+              <div className="photo-actions">
+                <button onClick={() => startEditing(photo)} className="edit-button">Edit</button>
+                <button onClick={() => deletePhoto(photo.id)} className="delete-button">Delete</button>
+              </div>
             </div>
           ))
         )}
@@ -38,12 +55,15 @@ const Home = () => {
         <div className="modal-overlay">
           <div className="modal-content">
             <button
-              onClick={() => setShowUploadModal(false)}
+              onClick={() => {
+                setShowUploadModal(false);
+                setNewPhoto({ title: "", description: "", tags: "", photo: "" }); // Reset newPhoto
+              }}
               className="close-button"
             >
               &times;
             </button>
-            <h2>Upload New Photo</h2>
+            <h2>{editingPhoto ? "Edit Photo" : "Upload New Photo"}</h2>
             <input
               type="text"
               placeholder="Title"
@@ -62,13 +82,22 @@ const Home = () => {
               value={newPhoto.tags}
               onChange={(e) => setNewPhoto({ ...newPhoto, tags: e.target.value })}
             />
-            <input
-              type="text"
-              placeholder="Image URL"
-              value={newPhoto.url}
-              onChange={(e) => setNewPhoto({ ...newPhoto, url: e.target.value })}
-            />
-            <button onClick={uploadPhoto}>Upload</button>
+            <input type="file" onChange={handleFileChange} />
+
+            <button
+              onClick={() => {
+                console.log("Button clicked"); // Debugging log
+                if (editingPhoto) {
+                  console.log("Calling updatePhoto"); // Debugging log
+                  updatePhoto();
+                } else {
+                  console.log("Calling uploadPhoto"); // Debugging log
+                  uploadPhoto();
+                }
+              }}
+            >
+              {editingPhoto ? "Update" : "Upload"}
+            </button>
           </div>
         </div>
       )}
