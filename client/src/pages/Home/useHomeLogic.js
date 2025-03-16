@@ -12,13 +12,15 @@ const useHomeLogic = () => {
     getPhotos();
   }, []);
 
+
+  
   const getPhotos = async () => {
     const user_id = localStorage.getItem("user_id");
     if (!user_id) {
       console.error("User ID not found. User might not be logged in.");
       return;
     }
-
+    
     const response = await request({
       method: requestMethods.GET,
       route: `/getAll?user_id=${user_id}`,
@@ -27,6 +29,8 @@ const useHomeLogic = () => {
     setPhotos(response.error ? [] : response);
   };
 
+
+  
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -137,7 +141,8 @@ const useHomeLogic = () => {
     deletePhoto, 
     startEditing, 
     updatePhoto,
-    editingPhoto 
+    editingPhoto,
+  
   };
 };
 

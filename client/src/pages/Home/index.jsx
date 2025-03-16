@@ -54,15 +54,7 @@ const Home = () => {
       {showUploadModal && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <button
-              onClick={() => {
-                setShowUploadModal(false);
-                setNewPhoto({ title: "", description: "", tags: "", photo: "" }); // Reset newPhoto
-              }}
-              className="close-button"
-            >
-              &times;
-            </button>
+
             <h2>{editingPhoto ? "Edit Photo" : "Upload New Photo"}</h2>
             <input
               type="text"
@@ -97,6 +89,15 @@ const Home = () => {
               }}
             >
               {editingPhoto ? "Update" : "Upload"}
+            </button><br></br>
+            <button
+              onClick={() => {
+                setShowUploadModal(false);
+                setNewPhoto({ title: "", description: "", tags: "", photo: "" }); // Reset newPhoto
+              }}
+              className="close-button"
+            >
+              Cancel
             </button>
           </div>
         </div>
