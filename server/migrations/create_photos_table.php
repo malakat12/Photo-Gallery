@@ -7,6 +7,7 @@ $sql = "CREATE TABLE IF NOT EXISTS photos (
             user_id INT NOT NULL,
             title TEXT NOT NULL,
             description TEXT,
+            tags VARCHAR(255) NOT NULL,
             url VARCHAR(255) NOT NULL,
             CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         )"; 
