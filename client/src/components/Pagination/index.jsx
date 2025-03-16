@@ -5,7 +5,7 @@ const Pagination = ({ currentPage, totalPages, paginate }) => {
     <div className="pagination">
       <button
         onClick={() => paginate(currentPage - 1)}
-        disabled={currentPage === 1} // Disable "Previous" on the first page
+        disabled={currentPage === 1} 
       >
         Previous
       </button>

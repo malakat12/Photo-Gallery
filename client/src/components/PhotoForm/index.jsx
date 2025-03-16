@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import "../styles/PhotoForm.css";
 
 const PhotoForm = ({ initialData, onSubmit }) => {
   const [formData, setFormData] = useState(
@@ -22,28 +21,11 @@ const PhotoForm = ({ initialData, onSubmit }) => {
     }
   };
 
-  const handleSubmit = async (formData) => {
-    const userId = localStorage.getItem("userId"); // Get user ID
-    if (!userId) {
-      console.error("User ID not found");
-      return;
-    }
-  
-    console.log("Form Data:", formData); // Debugging
-  
-    try {
-      if (editingPhoto) {
-        await updatePhoto(editingPhoto.id, { ...formData, user_id: userId });
-      } else {
-        await uploadPhoto({ ...formData, user_id: userId });
-      }
-      setEditingPhoto(null);
-      setShowUploadModal(false); // Close the modal after upload
-      fetchPhotos();
-    } catch (error) {
-      console.error("Failed to submit form:", error);
-    }
+  const handleSubmit = (e) => {
+    e.preventDefault(); // Prevent page refresh
+    onSubmit(formData); // Call the parent function
   };
+
   return (
     <form onSubmit={handleSubmit} className="photo-form">
       <input

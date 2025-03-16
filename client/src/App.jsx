@@ -1,19 +1,26 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import Gallery from "./pages/Gallery";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import "./styles/App.css";
+import Auth from "./pages/Auth";
+import Home from "./pages/Home";
+import SideBar from "./components/SideBar";
+import Signup from "./pages/Auth/signUp";
 
-function App() {
+const App = () => {
+  const { pathname } = useLocation();
+
   return (
-    <Router>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/gallery" element={<Gallery />} />
-        <Route path="/" element={<Login />} /> {/* Default route */}
-      </Routes>
-    </Router>
+    <>
+      {/* <nav>Navbar</nav> */}
+      <div className="flex">
+        {/* Conditional rendering */}
+        <Routes>
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/auth/signup" element={<Signup />} />
+          <Route path="/" element={<Home />} />
+        </Routes>
+      </div>
+    </>
   );
-}
+};
 
 export default App;

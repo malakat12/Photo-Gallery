@@ -1,5 +1,4 @@
 import React from "react";
-import "../styles/PhotoCard.css";
 
 const PhotoCard = ({ photo, onEdit, onDelete }) => {
   return (
