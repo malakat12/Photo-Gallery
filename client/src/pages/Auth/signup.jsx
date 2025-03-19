@@ -35,26 +35,27 @@ const Signup = () => {
 
     if (!response.error) {
       console.log(response);
-      navigate("/auth");
+      navigate("/");
     } else {
       setErrorMessage("Signup failed");
     }
   };
 
   return (
-    <div className="flex column">
+    <div className="auth-container">
+      <div className="auth-box">
        <input
         type="text"
         name="full_name"
         placeholder="John Doe"
         onChange={handleInputChange}
-      />
+      /><br></br>
       <input
         type="text"
         name="email"
         placeholder="johnDoe@mail.com"
         onChange={handleInputChange}
-      />
+      /><br></br>
       <input
         type="password"
         name="password"
@@ -64,8 +65,8 @@ const Signup = () => {
       {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
 
       <Button text="Signup" onClick={signup} textColor={colors.BLACK} color="" />
-      <p>Have an account? <a href="/auth">Login</a></p>
-
+      <p>Have an account? <a href="/">Login</a></p>
+    </div>
     </div>
   );
 };

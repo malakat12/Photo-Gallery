@@ -38,7 +38,7 @@ const Auth = () => {
     if (!response.error) {
       localStorage.setItem("user_id", response.user.id); 
       console.log(response);
-      navigate("/");
+      navigate("/home");
     } else {
       setErrorMessage(response.message || "Login failed. Please check your credentials.");
     }

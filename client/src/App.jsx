@@ -10,13 +10,11 @@ const App = () => {
 
   return (
     <>
-      {/* <nav>Navbar</nav> */}
       <div className="flex">
-        {/* Conditional rendering */}
         <Routes>
-          <Route path="/auth" element={<Auth />} />
+          <Route path="/" element={<Auth />} />
           <Route path="/auth/signup" element={<Signup />} />
-          <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Home />} />
         </Routes>
       </div>
     </>

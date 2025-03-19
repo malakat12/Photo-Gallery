@@ -78,12 +78,9 @@ const Home = () => {
 
             <button
               onClick={() => {
-                console.log("Button clicked"); // Debugging log
                 if (editingPhoto) {
-                  console.log("Calling updatePhoto"); // Debugging log
                   updatePhoto();
                 } else {
-                  console.log("Calling uploadPhoto"); // Debugging log
                   uploadPhoto();
                 }
               }}
@@ -93,7 +90,7 @@ const Home = () => {
             <button
               onClick={() => {
                 setShowUploadModal(false);
-                setNewPhoto({ title: "", description: "", tags: "", photo: "" }); // Reset newPhoto
+                setNewPhoto({ title: "", description: "", tags: "", photo: "" });
               }}
               className="close-button"
             >
